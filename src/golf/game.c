@@ -278,6 +278,9 @@ static void _golf_game_update_state_watching_ball(float dt) {
         game.ball.vel = V3(0, 0, 0);
         game.ball.rot_vel = 0;
         game.ball.orientation = QUAT(0, 0, 0, 1);
+        if (game.stroke_count == 1) {
+            game.stroke_count = 0;
+        }
         game.ball.is_out_of_bounds = 0;
         game.cam.angle = game.cam.start_angle;
         game.cam.auto_rotate = false;
