@@ -1214,7 +1214,7 @@ static void _golf_ui_in_game(float dt) {
             vec2 uv0 = V2(0, 0);
             vec2 uv1 = V2(1, 1);
             float is_font = 0;
-            vec4 overlay_color = V4(1, 1, 1, 1);
+            vec4 overlay_color = V4(0, 0, 0, 0);
             vec_push(&ui.draw_entities, _golf_ui_draw_entity(texture->sg_image, pos, size, angle, uv0, uv1, is_font, overlay_color, alpha));
         }
     }
