@@ -1121,9 +1121,6 @@ static void _golf_ui_in_game_paused(float dt) {
     if (_golf_ui_button_name(layout, "pause_menu_resume_button")) {
         golf_game_resume();
     }
-    if (_golf_ui_button_name(layout, "pause_menu_retry_button")) {
-        _golf_ui_start_fade_out(false, false, 0, true);
-    }
     if (_golf_ui_button_name(layout, "pause_menu_exit_button")) {
         _golf_ui_start_fade_out(true, false, 0, false);
     }
@@ -1170,6 +1167,9 @@ static void _golf_ui_in_game(float dt) {
         if (_golf_ui_button_name(layout, "pause_button")) {
             golf_game_pause();
         }
+		if (_golf_ui_button_name(layout, "retry_button")) {
+		    _golf_ui_start_fade_out(false, false, 0, true);
+		}
     }
 
     float temp_val;
@@ -1214,7 +1214,7 @@ static void _golf_ui_in_game(float dt) {
             vec2 uv0 = V2(0, 0);
             vec2 uv1 = V2(1, 1);
             float is_font = 0;
-            vec4 overlay_color = V4(1, 1, 1, 1);
+            vec4 overlay_color = V4(0, 0, 0, 0);
             vec_push(&ui.draw_entities, _golf_ui_draw_entity(texture->sg_image, pos, size, angle, uv0, uv1, is_font, overlay_color, alpha));
         }
     }
@@ -1241,7 +1241,10 @@ static void _golf_ui_in_game(float dt) {
             break;
     }
 
-    float fade_in_length = CFG_NUM(game_cfg, "game_fade_in_length");
+    float fade_in_length = ui.fade_out.to_retry ? 
+        CFG_NUM(game_cfg, "game_fade_in_length_retry") :
+        CFG_NUM(game_cfg, "game_fade_in_length");
+
     float time_to_show_level_num = CFG_NUM(game_cfg, "game_time_to_show_level_num");
 
     if (golf->in_game.t < time_to_show_level_num + fade_in_length) {
@@ -1253,7 +1256,10 @@ static void _golf_ui_in_game(float dt) {
             }
             entity->text.text.len = 0;
             golf_string_appendf(&entity->text.text, "LEVEL %d", golf->level_num + 1);
-            _golf_ui_text(layout, *entity, alpha);
+            
+            if (ui.fade_out.to_retry == false) {
+                _golf_ui_text(layout, *entity, alpha);
+            }
         }
     }
 
@@ -1294,7 +1300,9 @@ void golf_ui_update(float dt) {
     }
 
     if (ui.fade_out.active) {
-        float fade_out_length = CFG_NUM(game_cfg, "game_fade_in_length");
+        float fade_out_length = ui.fade_out.to_retry ? 
+            CFG_NUM(game_cfg, "game_fade_in_length_retry") :
+            CFG_NUM(game_cfg, "game_fade_in_length");
         float alpha = (ui.fade_out.t / fade_out_length);
         _golf_ui_draw_fade(alpha);
 
@@ -1308,7 +1316,7 @@ void golf_ui_update(float dt) {
                 golf_start_level(ui.fade_out.level);
             }
             else if (ui.fade_out.to_retry) {
-                golf_game_start_level();
+                golf_game_start_level(true);
                 golf->in_game.t = 0;
             }
         }
