@@ -1168,7 +1168,7 @@ static void _golf_ui_in_game(float dt) {
             golf_game_pause();
         }
 		if (_golf_ui_button_name(layout, "retry_button")) {
-		    golf_game_start_level(true);
+		    _golf_ui_start_fade_out(false, false, 0, true);
 		}
     }
 
@@ -1241,7 +1241,10 @@ static void _golf_ui_in_game(float dt) {
             break;
     }
 
-    float fade_in_length = CFG_NUM(game_cfg, "game_fade_in_length");
+    float fade_in_length = ui.fade_out.to_retry ? 
+        CFG_NUM(game_cfg, "game_fade_in_length_retry") :
+        CFG_NUM(game_cfg, "game_fade_in_length");
+
     float time_to_show_level_num = CFG_NUM(game_cfg, "game_time_to_show_level_num");
 
     if (golf->in_game.t < time_to_show_level_num + fade_in_length) {
@@ -1297,7 +1300,9 @@ void golf_ui_update(float dt) {
     }
 
     if (ui.fade_out.active) {
-        float fade_out_length = CFG_NUM(game_cfg, "game_fade_in_length");
+        float fade_out_length = ui.fade_out.to_retry ? 
+            CFG_NUM(game_cfg, "game_fade_in_length_retry") :
+            CFG_NUM(game_cfg, "game_fade_in_length");
         float alpha = (ui.fade_out.t / fade_out_length);
         _golf_ui_draw_fade(alpha);
 
